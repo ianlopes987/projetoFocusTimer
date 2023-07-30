@@ -1,59 +1,75 @@
-import "./controls"
-import "./timer.js"
-
-const buttonPlay = document.querySelector('.play');
-const buttonPause = document.querySelector('.pause');
-const buttonStop = document.querySelector('.stop');
-const buttonSet = document.querySelector('.set');
-const buttonSoundOff = document.querySelector('.sound-off');
-const buttonSoundOn = document.querySelector('.sound-on');
-const minutesDisplay = document.querySelector('.minutes');
-const secondesDisplay = document.querySelector('.seconds');
-let minutes = Number(minutesDisplay.textContent);
-
-buttonPlay.addEventListener('click',playOn);
-
-buttonPause.addEventListener('click',pauseOn);
-
-buttonStop.addEventListener('click',stopOn);
-
-buttonSoundOff.addEventListener('click',soundOff);
-
-buttonSoundOn.addEventListener('click',soundOn);
-
-buttonSet.addEventListener('click',setMinutes);
+import {Controls} from "./controls.js" /*  aqui estou importando arquivos arquivos .js e usando a modularizacao  */
+import {Timer} from "./timer.js"
+import {Reset} from "./reset.js"
+import Sound from "./sounds.js"
+import {
+    buttonPlay,
+    buttonPause,
+    buttonStop,
+    buttonSet,
+    buttonSoundOff,
+    buttonSoundOn,
+    minutesDisplay,
+    secondesDisplay
+}  from "./elements.js"
 
 
-function playOn(){
-    buttonPlay.classList.add('hide');
-    buttonPause.classList.remove('hide');
-    buttonSet.classList.add('hide');
-    buttonStop.classList.remove('hide');
-    countDown();
-}
+const sound = Sound();
 
-function pauseOn(){
-    buttonPause.classList.add('hide');
-    buttonPlay.classList.remove('hide');
-    clearTimeout(timerTimeOut);
-}
 
-function stopOn(){
-    buttonPlay.classList.remove('hide');
-    buttonPause.classList.add('hide');
-    buttonSet.classList.remove('hide');
-    buttonStop.classList.add('hide');
-    resetTimer();
-}
+const resetControls = Reset({
+    buttonPlay,
+    buttonPause,
+    buttonSet,
+    buttonStop
+})
 
-function soundOff(){
-    buttonSoundOff.classList.add('hide');
-    buttonSoundOn.classList.remove('hide');
-}
+/*  aqui estou usando uma estrategia chamada Factory criando objetos 
+para serem trabalhados junto a modularizacao. 
+essa estrategia consiste em criar as funcoes de um determinado arquivo dentro
+de uma funcao pai, que essa funcao pai vai ter parametros dentro dela, que sao justamente
+as variaveis do arquivo de destino que voce quer usar
+entao nesse exemplo do Timer eu estou criando uma const timer e
+chamando a funcao que contem outras funcoes dentro dela no arquivo timer.js
+tambem estou incluindo nos parametros as variaveis que precisará ser executada
+dentro dela. entao assim eu consigo usar modulos dentro de modulos sem precisar
+esta modularizando tudo. estrategia interessante.*/
 
-function soundOn(){
-    buttonSoundOn.classList.add('hide');
-    buttonSoundOff.classList.remove('hide');
-}
+const timer = Timer({
+    minutesDisplay,
+    secondesDisplay,
+    resetControls
+})
+
+const controls = Controls({
+    buttonPlay,
+    buttonPause,
+    buttonSet,
+    buttonStop,
+    timer,
+    buttonSoundOff,
+    buttonSoundOn,
+    resetControls
+})
+
+
+
+
+buttonPlay.addEventListener('click',controls.playOn);
+
+/* aqui eu adiciono um evento de CLICK no buttonPlay ao colicar ele executa a funcao playOn  */
+
+buttonPause.addEventListener('click',controls.pauseOn);
+
+buttonStop.addEventListener('click',controls.stopOn);
+
+buttonSoundOff.addEventListener('click',controls.soundOff);
+
+buttonSoundOn.addEventListener('click',controls.soundOn);
+
+buttonSet.addEventListener('click',controls.setMinutes);
+
+
+
 
 
